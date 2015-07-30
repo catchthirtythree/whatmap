@@ -1,0 +1,126 @@
+<script src="assets/js/vendor/jquery.js"></script>
+<script>
+var Map = function(id, name, tier, islinear, stages) {
+	this.id = id;
+	this.name = name;
+	this.tier = tier;
+	this.islinear = islinear;
+	this.stages = stages;
+}
+
+Map.prototype = {
+	getTier: function() {
+		return "Tier " + this.tier;
+	},
+
+	getType: function() {
+		return (!!this.islinear ? "Linear" : this.stages + " Stages");
+	}
+}
+
+var MapTDG = function() { };
+
+MapTDG.findId = function(id) {
+	console.log('ajax id')
+    return $.ajax({
+		type: "GET",
+		url: "search.php?id=" + id,
+		async: false
+	}).responseText;
+}
+
+MapTDG.findName = function(query) {
+	console.log('ajax name')
+    return $.ajax({
+		type: "GET",
+		url: "search.php?q=" + query,
+		async: false
+	}).responseText;
+}
+
+var MapIdentityMap = function() { 
+	this.map = {};
+};
+
+MapIdentityMap.prototype = {
+	getId: function(id) {
+		return this.map[id];
+	},
+
+	getName: function(name) {
+		var list = [], regex = '/' + name + '/';
+		for (var i = 0; i < this.map.length; ++i)
+			if (this.map[i].name.match(regex))
+				list.push(map);
+		return list;
+	},
+
+	insert: function(id, map) {
+		this.map[id] = map;
+	},
+
+	show: function() {
+		for (var i = 0; i < this.map.length; ++i)
+			console.log(this.map[i])
+	}
+};
+
+var MapDataMapper = function() { };
+
+MapDataMapper.id_map = new MapIdentityMap();
+
+MapDataMapper.buildObject = function(json) {
+	var map = new Map(json.id, json.name, json.tier, json.islinear, json.stages);
+	this.id_map.insert(map.id, map);
+	return map;
+}
+
+MapDataMapper.buildObjects = function(json) {
+	var list = [],
+		self = this;
+
+	json.forEach(function(map) {
+		var map = new Map(map.id, map.name, map.tier, map.islinear, json.stages);
+		self.id_map.insert(map.id, map);
+		list.push(map);
+	});
+
+	return list;
+}
+
+MapDataMapper.findId = function(query) {
+	var response = this.id_map.getId(query);
+
+	if (!response) {
+		response = MapTDG.findId(query);
+
+		if (response) {
+			var json = eval('(' + response + ')');
+			return MapDataMapper.buildObject(json[0]);
+		}
+	}
+
+	return response;
+}
+
+MapDataMapper.findName = function(query) {
+	//var response = this.id_map.getName(query);
+
+	//if (response.length == 0) {
+	var response = MapTDG.findName(query);
+
+	if (response) {
+		var json = eval('(' + response + ')');
+		return MapDataMapper.buildObjects(json);
+	} 
+	//}
+
+	return response;
+}
+
+console.log('output:', MapDataMapper.findId(1).getTier())
+console.log('output:', MapDataMapper.findId(1))
+console.log('output:', MapDataMapper.findName('surf_aircontrol'))
+console.log('output:', MapDataMapper.findName('surf_ai'))
+
+</script>
