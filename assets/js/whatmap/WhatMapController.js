@@ -132,7 +132,7 @@ var WhatMapController = function() {
 		for (var i = 0; i < maps.length; ++i) {
 			$('#' + maps[i].id).remove();
 			self.$table.append(self.createMapColumn(maps[i]));
-			$('#' + maps[i].id).click(function(data) {
+			$('#' + maps[i].id).click(function(event) {
 				console.log(event.target.id)
 				self.search(event.target.id);
 			});
