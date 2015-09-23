@@ -56,7 +56,12 @@
 		</ul>
 		
 		<div data-alert class="alert-box secondary" style="text-align: center;">
-			YouTube changed its API. Sorry.
+			Try searching "surf" for a list of all maps. 
+			<a href="#" class="close">&times;</a>
+		</div>
+		
+		<div data-alert class="alert-box secondary" style="text-align: center;">
+			Adapted to Youtube API v3; might return random videos at times.
 			<a href="#" class="close">&times;</a>
 		</div>
 	</div>
