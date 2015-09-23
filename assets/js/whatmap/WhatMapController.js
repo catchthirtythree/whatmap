@@ -2,8 +2,7 @@ var WhatMapController = function() {
 	var self = this;
 	
 	var channel = [
-		"https://gdata.youtube.com/feeds/api/videos?author=ksfrecords&v=2&orderby=rating&alt=jsonc&q={0}",
-		"https://gdata.youtube.com/feeds/api/videos?author=sourcesurf&v=2&orderby=rating&alt=jsonc&q={0}",
+		"https://www.googleapis.com/youtube/v3/search?&forUsername=ksfrecords&q={0}&key=AIzaSyBAiqL_S3tVfpHNHix6sJ9vlcbIcw3X1VQ%20&part=snippet"
 	];
 
 	var regex = /[^]*\/\*([^]*)\*\/\}$/;
@@ -97,26 +96,20 @@ var WhatMapController = function() {
 		
 		if (map.name.slice(-1) === "_")
 			map.name = map.name.slice(0, -1);
-
-		$.when(
-			$.ajax(channel[0].format(map.name)), 
-			$.ajax(channel[1].format(map.name)).then(
-			function (resp1, resp2, resp3) {
-				var html  = "No video was found, try going <a href=\"http://www.youtube.com/results?search_query=" + map.name.replace(/_/g, " ") + " wr\" target=\"youtubes\">here</a>.",
-					resps = [ resp1, resp2, resp3 ],
-					found = false;
-				
-				resps.forEach(function(resp) {
-					if (resp !== undefined && !found) {
-						console.log(resp.data)
-						html = "<iframe width=\"560\" height=\"315\" src=\"//www.youtube.com/embed/" + resp.data.items[0].id + "\" frameborder=\"0\" allowfullscreen></iframe>";
-						found = true;
-					}
-				});
-				
-				self.$mapvideo.html(html);
-			})
-		);
+		
+		$.getJSON(channel[0].format(map.name), function(response) {
+			var html;
+			if (response.items === undefined) {
+				html = "No video was found, try going <a href=\"http://www.youtube.com/results?search_query=" + map.name.replace(/_/g, " ") + " wr\" target=\"youtubes\">here</a>.";
+			} else {
+				html = "<iframe width=\"560\" height=\"315\" src=\"//www.youtube.com/embed/" + response.items[0].id.videoId + "\" frameborder=\"0\" allowfullscreen></iframe>";
+			}
+			
+			console.log(response)
+			console.log(map.name + ", " + response.items[0].id.videoId)
+			
+			self.$mapvideo.html(html);
+		});
 	}
 
 	this.showResults = function(maps) {
@@ -133,8 +126,7 @@ var WhatMapController = function() {
 			$('#' + maps[i].id).remove();
 			self.$table.append(self.createMapColumn(maps[i]));
 			$('#' + maps[i].id).click(function(event) {
-				console.log(event.target.id)
-				self.search(event.target.id);
+				self.search(event.target.id)
 			});
 		}
 		
