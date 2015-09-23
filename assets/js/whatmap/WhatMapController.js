@@ -1,11 +1,7 @@
 var WhatMapController = function() {
 	var self = this;
-	
-	var channel = [
-		"https://www.googleapis.com/youtube/v3/search?&forUsername=ksfrecords&q={0}&key=AIzaSyBAiqL_S3tVfpHNHix6sJ9vlcbIcw3X1VQ%20&part=snippet"
-	];
-
 	var regex = /[^]*\/\*([^]*)\*\/\}$/;
+	var channel = "https://www.googleapis.com/youtube/v3/search?&forUsername=ksfrecords&q={0}&key=AIzaSyBAiqL_S3tVfpHNHix6sJ9vlcbIcw3X1VQ%20&part=snippet";
 
 	this.init = function() {
 		this.$map = $('.map').hide();
@@ -97,7 +93,7 @@ var WhatMapController = function() {
 		if (map.name.slice(-1) === "_")
 			map.name = map.name.slice(0, -1);
 		
-		$.getJSON(channel[0].format(map.name), function(response) {
+		$.getJSON(channel.format(map.name), function(response) {
 			var html;
 			if (response.items === undefined) {
 				html = "No video was found, try going <a href=\"http://www.youtube.com/results?search_query=" + map.name.replace(/_/g, " ") + " wr\" target=\"youtubes\">here</a>.";
